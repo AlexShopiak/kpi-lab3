@@ -118,13 +118,25 @@ func (pw *Visualizer) handleEvent(e any, t screen.Texture) {
 			log.Printf("ERROR: %s", e)
 	
 		case mouse.Event:
-			
+			if t == nil {
+				if e.Button == mouse.ButtonLeft && e.Direction == mouse.DirPress {
+					pw.mouseCoords = image.Point{
+						X: int(e.X),
+						Y: int(e.Y),
+					}
+	
+					pw.w.Send(paint.Event{})
+				}
+			}
 	
 		case paint.Event:
 			// Малювання контенту вікна.
 			if t == nil {
 				pw.drawDefaultUI()
-			} 
+			} else {
+				// Використання текстури отриманої через виклик Update.
+				pw.w.Scale(pw.sz.Bounds(), t, t.Bounds(), draw.Src, nil)
+			}
 			pw.w.Publish()
 		}
 }
