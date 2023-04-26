@@ -18,6 +18,8 @@ func main() {
 	)
 
 	//pv.Debug = true
+	pv.Width = 800
+	pv.Height = 800
 	pv.Title = "Simple painter"
 
 	pv.OnScreenReady = opLoop.Start

@@ -17,6 +17,8 @@ import (
 )
 
 type Visualizer struct {
+	Width         int
+	Height        int
 	Title         string
 	Debug         bool
 	OnScreenReady func(s screen.Screen)
@@ -45,9 +47,9 @@ func (pw *Visualizer) Update(t screen.Texture) {
 
 func (pw *Visualizer) run(s screen.Screen) {
 	w, err := s.NewWindow(&screen.NewWindowOptions{
+		Width:  pw.Width,
+		Height:  pw.Height,
 		Title:  pw.Title,
-		Width:  800,
-		Height: 800,
 	})
 	if pw.OnScreenReady != nil {
 		pw.OnScreenReady(s)
