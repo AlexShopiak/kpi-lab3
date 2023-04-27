@@ -28,15 +28,15 @@ type Visualizer struct {
 	done chan struct{}
 
 	sz  size.Event
-	pos image.Rectangle
+	//pos image.Rectangle
 	mouseCoords image.Point
 }
 
 func (pw *Visualizer) Main() {
 	pw.tx = make(chan screen.Texture)
 	pw.done = make(chan struct{})
-	pw.pos.Max.X = 200
-	pw.pos.Max.Y = 200
+	//pw.pos.Max.X = 200
+	//pw.pos.Max.Y = 200
 	pw.mouseCoords = image.Point{X: 400, Y: 400}
 	driver.Main(pw.run)
 }
