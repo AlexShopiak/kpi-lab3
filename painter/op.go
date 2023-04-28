@@ -1,6 +1,7 @@
 package painter
 
 import (
+	"image"
 	"image/color"
 
 	"golang.org/x/exp/shiny/screen"
@@ -52,10 +53,12 @@ func Reset(t screen.Texture) {
 }
 
 type BgRect struct{
-	x1, y1, x2, y2 int //todo
+	x1, y1, x2, y2 int 
 }
-func (b BgRect) Do(t screen.Texture) bool {
-	return false //todo
+func (b *BgRect) Do(t screen.Texture) bool {
+	c := color.Black
+	t.Fill(image.Rect(b.x1, b.y1, b.x2, b.y2), c, screen.Src)
+	return false
 }
 
 type Figure struct{
