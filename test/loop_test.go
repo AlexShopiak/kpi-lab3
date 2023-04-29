@@ -18,8 +18,8 @@ func TestLoop_Post(t *testing.T) {
 
 	l.Start(mockScreen{})
 
-	l.Post(painter.OperationFunc(painter.WhiteFill))
-	l.Post(painter.OperationFunc(painter.GreenFill))
+	l.Post(painter.OperationFunc(painter.WhiteFill)) //#1
+	l.Post(painter.OperationFunc(painter.GreenFill)) //#2
 	l.Post(painter.UpdateOp)
 
 	if tr.LastTexture != nil {
@@ -27,6 +27,14 @@ func TestLoop_Post(t *testing.T) {
 	}
 
 	l.StopAndWait()
+
+	tx, ok := tr.LastTexture.(*mockTexture)
+	if !ok {
+		t.Fatal("Receiver still nasn't texture")
+	}
+	if tx.FillCnt != 2 {
+		t.Fatal("Unexpected num of Fill calls")
+	}
 }
 
 //Mocks
