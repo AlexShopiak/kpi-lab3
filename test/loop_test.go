@@ -10,6 +10,7 @@ func Test(t *testing.T) { TestingT(t) }
 type MySuite struct{}
 var _ = Suite(&MySuite{})
 
+//TODO
 func (s *MySuite) TestFailer(c *C) {
 	c.Assert("Alex", Equals, "Alexandr")
 }
