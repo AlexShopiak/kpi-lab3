@@ -1,13 +1,10 @@
 package test
 
-import (
-	. "gopkg.in/check.v1"
-)
+import "testing"
 
-type ParserSuite struct{}
-var _ = Suite(&ParserSuite{})
+func TestStub(t *testing.T) {
 
-//TODO
-func (s *ParserSuite) TestAccesser(c *C) {
-	c.Assert("Alex", Not(Equals), "Alexandr")
+	if "5" == "6" {
+		t.Fatal("Ooops")
+	}
 }
