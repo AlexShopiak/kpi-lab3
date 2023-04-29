@@ -7,10 +7,10 @@ import (
 )
 
 func Test(t *testing.T) { TestingT(t) }
-type MySuite struct{}
-var _ = Suite(&MySuite{})
+type LoopSuite struct{}
+var _ = Suite(&LoopSuite{})
 
 //TODO
-func (s *MySuite) TestFailer(c *C) {
+func (s *LoopSuite) TestFailer(c *C) {
 	c.Assert("Alex", Equals, "Alexandr")
 }
