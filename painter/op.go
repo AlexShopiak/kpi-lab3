@@ -7,15 +7,11 @@ import (
 	"golang.org/x/exp/shiny/screen"
 )
 
-// Operation змінює вхідну текстуру.
-type Operation interface {
-	// Do виконує зміну операції, повертаючи true, якщо текстура вважається готовою для відображення.
-	Do(t screen.Texture) (ready bool)
+type Operation interface { // Operation змінює вхідну текстуру.
+	Do(t screen.Texture) (ready bool) // Do виконує зміну операції, повертаючи true, якщо текстура вважається готовою для відображення.
 }
 
-// OperationList групує список операції в одну.
-type OperationList []Operation
-
+type OperationList []Operation // OperationList групує список операції в одну.
 func (ol OperationList) Do(t screen.Texture) (ready bool) {
 	for _, o := range ol {
 		ready = o.Do(t) || ready
@@ -25,14 +21,11 @@ func (ol OperationList) Do(t screen.Texture) (ready bool) {
 
 // UpdateOp операція, яка не змінює текстуру, але сигналізує, що текстуру потрібно розглядати як готову.
 var UpdateOp = updateOp{}
-
 type updateOp struct{}
-
 func (op updateOp) Do(t screen.Texture) bool { return true }
 
 // OperationFunc використовується для перетворення функції оновлення текстури в Operation.
 type OperationFunc func(t screen.Texture)
-
 func (f OperationFunc) Do(t screen.Texture) bool {
 	f(t)
 	return false
@@ -40,16 +33,17 @@ func (f OperationFunc) Do(t screen.Texture) bool {
 
 // WhiteFill зафарбовує тестуру у білий колір. Може бути викоистана як Operation через OperationFunc(WhiteFill).
 func WhiteFill(t screen.Texture) {
-	t.Fill(t.Bounds(), color.White, screen.Src)
+	c := color.White
+	t.Fill(t.Bounds(), c, screen.Src)
 }
-
 // GreenFill зафарбовує тестуру у зелений колір. Може бути викоистана як Operation через OperationFunc(GreenFill).
 func GreenFill(t screen.Texture) {
-	t.Fill(t.Bounds(), color.RGBA{G: 0xff, A: 0xff}, screen.Src)
+	c := color.RGBA{G: 0xff, A: 0xff}
+	t.Fill(t.Bounds(), c, screen.Src)
 }
-
 func Reset(t screen.Texture) {
-	t.Fill(t.Bounds(), color.Black, screen.Src) //todo
+	c := color.Black
+	t.Fill(t.Bounds(), c, screen.Src)
 }
 
 type BgRect struct{
@@ -60,17 +54,25 @@ func (b *BgRect) Do(t screen.Texture) bool {
 	t.Fill(image.Rect(b.x1, b.y1, b.x2, b.y2), c, screen.Src)
 	return false
 }
-
+var figures []Figure //todo
 type Figure struct{
-	x, y int //todo
+	x, y int
 }
 func (f Figure) Do(t screen.Texture) bool {
-	return false //todo
+	c := color.RGBA{R: 225, G: 225, B: 0, A: 1}
+	t.Fill(image.Rect(f.x-200, f.y-200, f.x+200, f.y), c, screen.Src)
+	t.Fill(image.Rect(f.x-100, f.y-200, f.x+100, f.y+200), c, screen.Src)
+	return false 
 }
 
 type Move struct{
-	x, y int //todo
+	x, y int
 }
 func (m Move) Do(t screen.Texture) bool {
-	return false //todo
+	for _, figure := range figures {
+		figure.x += m.x
+		figure.y += m.y
+		//todo
+	}
+	return false
 }
