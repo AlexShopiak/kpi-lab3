@@ -1,5 +1,5 @@
 tests:
-	go test ./...
+	go test ./test
 
 out/example: cmd/painter/main.go
 	mkdir -p out
