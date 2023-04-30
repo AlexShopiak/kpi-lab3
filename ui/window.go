@@ -28,13 +28,15 @@ type Visualizer struct {
 	done chan struct{}
 
 	sz  size.Event
-	mouseCoords image.Point
+	mouseX int
+	mouseY int
 }
 
 func (pw *Visualizer) Main() {
 	pw.tx = make(chan screen.Texture)
 	pw.done = make(chan struct{})
-	pw.mouseCoords = image.Point{X: 400, Y: 400}
+	pw.mouseX = pw.Width/2
+	pw.mouseY = pw.Height/2
     driver.Main(pw.run)
 }
 
@@ -121,7 +123,8 @@ func (pw *Visualizer) handleEvent(e any, t screen.Texture) {
 		case mouse.Event:
 			if t == nil {
 				if e.Button == mouse.ButtonLeft && e.Direction == mouse.DirPress {
-					pw.mouseCoords = image.Point{X: int(e.X), Y: int(e.Y)}
+					pw.mouseX = int(e.X)
+					pw.mouseY = int(e.Y)
 					pw.w.Send(paint.Event{})
 				}
 			}
@@ -141,10 +144,13 @@ func (pw *Visualizer) handleEvent(e any, t screen.Texture) {
 func (pw *Visualizer) drawDefaultUI() {
 	pw.w.Fill(pw.sz.Bounds(), color.White, draw.Src) // Фон.
 
-	x, y := pw.mouseCoords.X, pw.mouseCoords.Y
+	w4 := pw.Width/4 
+	w8 := pw.Width/8 
+	x, y := pw.mouseX, pw.mouseY
 	c := color.RGBA{R: 225, G: 225, B: 0, A: 1}
-	pw.w.Fill(image.Rect(x-200, y-200, x+200, y), c, draw.Src)
-	pw.w.Fill(image.Rect(x-100, y-200, x+100, y+200), c, draw.Src)
+	
+	pw.w.Fill(image.Rect(x - w4, y - w4, x + w4, y), c, draw.Src)
+	pw.w.Fill(image.Rect(x - w8, y, x + w8, y + w4), c, draw.Src)
 
 	// Малювання білої рамки.
 	for _, br := range imageutil.Border(pw.sz.Bounds(), 10) {
