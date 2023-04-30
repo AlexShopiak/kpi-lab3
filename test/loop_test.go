@@ -20,7 +20,7 @@ func TestLoop_Post1(t *testing.T) {
 
 	l.Post(painter.OperationFunc(painter.WhiteFill)) //#1
 	l.Post(painter.OperationFunc(painter.GreenFill)) //#2
-	l.Post(painter.UpdateOp)
+	l.Post(painter.UpdateOp{})
 
 	if tr.LastTexture != nil {
 		t.Fatal("Receiver got the texture too early")
@@ -46,9 +46,9 @@ func TestLoop_Post2(t *testing.T) {
 	l.Start(mockScreen{})
 
 	l.Post(painter.OperationFunc(painter.GreenFill)) //#1
-	l.Post(painter.UpdateOp)
+	l.Post(painter.UpdateOp{})
 	l.Post(painter.OperationFunc(painter.GreenFill)) //#1
-	l.Post(painter.UpdateOp)
+	l.Post(painter.UpdateOp{})
 
 	l.StopAndWait()
 
