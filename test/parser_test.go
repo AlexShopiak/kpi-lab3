@@ -9,7 +9,7 @@ import (
 	"github.com/AlexShopiak/kpi-lab3/painter/lang"
 )
 
-func TestParser_Type1(t *testing.T) {
+func TestParser_Type(t *testing.T) {
 	p := lang.Parser{}
 	
 	expected := []painter.Operation{
@@ -34,38 +34,35 @@ func TestParser_Type1(t *testing.T) {
 	}
 }
 
-//=================================Mocks===================================
-//=========================================================================
-/*
-type mockReader struct {}
+func TestParser_InvalitOperation(t *testing.T) {
+	p := lang.Parser{}
+	r := strings.NewReader("upgrade")
+	_, err := p.Parse(r)
 
-func (r mockReader) Read(bytes []byte) (int, error) {
-	b := []byte("green \nwhite \nbgrect 1 2 3 4 \nupdate")
-	for i := range bytes {
-		bytes[i] = b[i]
+	if  err != lang.InvOprErr {
+		t.Fatal("Doesnt catch InvOprErr")
 	}
-	return len(bytes), nil
+
 }
 
+func TestParser_InvalidParams(t *testing.T) {
+	p := lang.Parser{}
+	r := strings.NewReader("bgrect 100 Alex 300 Andrew")
+	_, err := p.Parse(r)
 
-type MyReader struct {
-	data []byte
-	readIndex int64
-}
-
-func NewReader(toRead string) *MyReader {
-	return &MyReader{data: []byte(toRead)}
-}
-
-
-func (r *MyReader) Read(p []byte) (n int, err error) {
-	if r.readIndex >= int64(len(r.data)) {
-		err = io.EOF
-		return
+	if  err != lang.InvParErr {
+		t.Fatal("Doesnt catch InvParErr")
 	}
-	
-	n = copy(p, r.data[r.readIndex:])
-	r.readIndex += int64(n)
-	return
-}*/
 
+}
+
+func TestParser_LittleParams(t *testing.T) {
+	p := lang.Parser{}
+	r := strings.NewReader("bgrect 100 200")
+	_, err := p.Parse(r)
+
+	if  err != lang.LitParErr {
+		t.Fatal("Doesnt catch LitParErr")
+	}
+
+}

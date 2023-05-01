@@ -2,7 +2,6 @@ package lang
 
 import (
     "bufio"
-    "errors"
     "io"
     "strconv"
     "strings"
@@ -62,21 +61,18 @@ func parseLine(line string) (painter.Operation, error) {
 	case "reset":
 		return painter.OperationFunc(painter.Reset), nil
 	} 
-	return nil, errors.New("Invalid operation")
+	return nil, InvOprErr
 }
 
 func getCmdAndParams(cl string) (string, []int, error) {
 	fields := strings.Fields(cl)
-	if len(fields) == 0 {
-		return "", nil, errors.New("Empty string")
-	}
 	cmd := fields[0]
 	params := []int{}
 	
 	for _,field := range fields[1:] {
 		res, err := strconv.ParseFloat(field, 32)
 		if err != nil {
-			return "", nil, errors.New("Invalid params")
+			return "", nil, InvParErr
 		}
 		params = append(params, int(res))
 	}
@@ -84,11 +80,11 @@ func getCmdAndParams(cl string) (string, []int, error) {
 	switch cmd {
 	case "bgrect":
 		if len(params) < 4 {
-			return "", nil, errors.New("Little params")
+			return "", nil, LitParErr
 		}
 	case "figure","move":
 		if len(params) < 2 {
-			return "", nil, errors.New("Little params")
+			return "", nil, LitParErr
 		}
 	}
 
