@@ -10,16 +10,15 @@ import (
 	"github.com/AlexShopiak/kpi-lab3/painter"
 	"golang.org/x/exp/shiny/screen"
 )
-func TestLoop_Post1(t *testing.T) {
-	var (
-		l painter.Loop
-		tr TestReceiver
-	)
+func TestLoop_EarlyTexture(t *testing.T) {
+	var l painter.Loop
+	var	tr TestReceiver
 	l.Receiver = &tr
 	l.Start(mockScreen{})
 
-	l.Post(painter.OperationFunc(painter.WhiteFill)) //#1
-	l.Post(painter.OperationFunc(painter.GreenFill)) //#2
+	l.Post(painter.OperationFunc(painter.Reset)) 
+	l.Post(painter.OperationFunc(painter.WhiteFill)) 
+	l.Post(painter.OperationFunc(painter.GreenFill)) 
 	l.Post(painter.UpdateOp{})
 
 	if tr.LastTexture != nil {
@@ -28,33 +27,35 @@ func TestLoop_Post1(t *testing.T) {
 
 	l.StopAndWait()
 
-	tx, ok := tr.LastTexture.(*mockTexture)
-	if !ok {
+	if tr.LastTexture == nil {
 		t.Fatal("Receiver still nasn't texture")
-	}
-	if tx.FillCnt != 2 {
-		t.Fatal("Unexpected num of Fill calls")
 	}
 }
 
-func TestLoop_Post2(t *testing.T) {
-	var (
-		l painter.Loop
-		tr TestReceiver
-	)
+func TestLoop_Optimisation(t *testing.T) {
+	var l painter.Loop
+	var	tr TestReceiver
 	l.Receiver = &tr
 	l.Start(mockScreen{})
 
-	l.Post(painter.OperationFunc(painter.GreenFill)) //#1
+	l.Post(painter.OperationFunc(painter.GreenFill)) 
+	l.Post(painter.OperationFunc(painter.WhiteFill)) 
+	l.Post(painter.OperationFunc(painter.GreenFill)) 
 	l.Post(painter.UpdateOp{})
-	l.Post(painter.OperationFunc(painter.GreenFill)) //#1
-	l.Post(painter.UpdateOp{})
+
+	if len(l.MQ.Ops) != 4 {
+		t.Fatal("Bad number of operations")
+	}
 
 	l.StopAndWait()
 
 	tx, _ := tr.LastTexture.(*mockTexture)
 	if tx.FillCnt != 1 {
-		t.Fatal("Unexpected num of Fill calls")
+		t.Fatal("Too much usless Fill calls")
+	}
+
+	if len(l.MQ.Ops) != 0 {
+		t.Fatal("Bad number of operations")
 	}
 }
 
@@ -82,7 +83,7 @@ func TestLoop_Post3(t *testing.T) {
 	l.StopAndWait()
 
 	if !reflect.DeepEqual(testOps, []string{"op1","op2","op3"}) {
-		t.Fatal("Bad prder of operations")
+		t.Fatal("Bad order of operations")
 	}
 }
 

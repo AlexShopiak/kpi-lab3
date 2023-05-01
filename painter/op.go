@@ -39,6 +39,8 @@ func (ol OperationList) Do(t screen.Texture) (ready bool) {
 	return
 }
 
+//Поетапно малює 3 шари
+//Власне малювання відбувається один раз в кінці, аби зберегти ресурси та не малювати в холосту
 //Сигналізує, що текстура готова
 type UpdateOp struct{}
 func (op UpdateOp) Do(t screen.Texture) bool {
