@@ -8,10 +8,20 @@ import (
 )
 
 //Зберігає поточний стан текстури
-var state = TextureState{}
+var state = TextureState{
+	color.White,
+	false,
+	BgrectOp{},
+	false,
+    []FigureOp{},
+}
+
 type TextureState struct {
-	BgRect Operation
-	Figures []FigureOp
+	BgClr      color.Color
+	HasRect    bool
+	BgRect     BgrectOp
+	HasFigures bool
+	Figures    []FigureOp
 }
 
 //Змінює вхідну текстуру
@@ -31,7 +41,24 @@ func (ol OperationList) Do(t screen.Texture) (ready bool) {
 
 //Сигналізує, що текстура готова
 type UpdateOp struct{}
-func (op UpdateOp) Do(t screen.Texture) bool { return true }
+func (op UpdateOp) Do(t screen.Texture) bool {
+	//1st layer
+	t.Fill(t.Bounds(), state.BgClr, screen.Src)
+	//2nd layer
+	if state.HasRect {
+		r := state.BgRect
+		t.Fill(image.Rect(r.X1, r.Y1, r.X2, r.Y2), color.Black, screen.Src) 
+	}
+    //3rd layer
+	if state.HasFigures {
+		for _, f := range state.Figures {
+			c := color.RGBA{R: 225, G: 225, B: 0, A: 1}
+			t.Fill(image.Rect(f.X-100, f.Y-100, f.X+100, f.Y), c, screen.Src)
+			t.Fill(image.Rect(f.X-50, f.Y, f.X+50, f.Y+100), c, screen.Src)
+		}
+	}
+	return true
+}
 
 //Перетворює функцію оновлення текстури в Operation
 type OperationFunc func(t screen.Texture)
@@ -40,55 +67,49 @@ func (f OperationFunc) Do(t screen.Texture) bool {
 	return false
 }
 
-//Зафарбовує тестуру у білий колір. Може бути викоистана як Operation через OperationFunc(WhiteFill).
+//Зафарбовує тестуру у білий колір
+//Може бути викоистана як Operation через OperationFunc(WhiteFill)
 func WhiteFill(t screen.Texture) {
-	t.Fill(t.Bounds(), color.White, screen.Src)
+	state.BgClr = color.White                          
 }
-//Зафарбовує тестуру у зелений колір. Може бути викоистана як Operation через OperationFunc(GreenFill).
+
+//Зафарбовує тестуру у зелений колір
+//Може бути викоистана як Operation через OperationFunc(GreenFill)
 func GreenFill(t screen.Texture) {
-	t.Fill(t.Bounds(), color.RGBA{G: 0xff, A: 0xff} , screen.Src)
+	state.BgClr = color.RGBA{R: 0, G: 255, B: 0, A: 1}
 }
-//Очищує текстуру та зафарбовує у чорний колір. Може бути викоистана як Operation через OperationFunc(Reset).
+
+//Очищує текстуру та зафарбовує у чорний колір
+//Може бути викоистана як Operation через OperationFunc(Reset)
 func Reset(t screen.Texture) {	
-	state.BgRect = nil
-	state.Figures = state.Figures[:0] //TODO can nil be here
-	t.Fill(t.Bounds(), color.Black, screen.Src)
+	state.BgClr = color.Black 
+	state.HasRect = false
+	state.BgRect = BgrectOp{}
+	state.HasFigures = false
+	state.Figures = []FigureOp{}
 }
 
 
-
-type BgrectOp struct{
-	X1, Y1, X2, Y2 int 
-}
+type BgrectOp struct{ X1, Y1, X2, Y2 int }
 func (r BgrectOp) Do(t screen.Texture) bool {
-	state.BgRect = r
-	c := color.Black
-	t.Fill(image.Rect(r.X1, r.Y1, r.X2, r.Y2), c, screen.Src) //neeedd
+	state.BgRect = BgrectOp{r.X1, r.Y1, r.X2, r.Y2}
+	state.HasRect = true 
 	return false
 }
 
 
-
-type FigureOp struct{
-	X, Y int
-}
-func (f FigureOp) Do(t screen.Texture) bool {
-	state.Figures = append(state.Figures, f)
-	c := color.RGBA{R: 225, G: 225, B: 0, A: 1}
-	t.Fill(image.Rect(f.X-200, f.Y-200, f.X+200, f.Y), c, screen.Src)
-	t.Fill(image.Rect(f.X-100, f.Y, f.X+100, f.Y+200), c, screen.Src)
+type FigureOp struct{ X, Y int }
+func (f FigureOp) Do(t screen.Texture) bool {	
+    state.Figures = append(state.Figures, FigureOp{f.X, f.Y})
+	state.HasFigures = true 
 	return false 
 }
 
-
-type MoveOp struct{
-	X, Y int
-}
+type MoveOp struct{ X, Y int }
 func (m MoveOp) Do(t screen.Texture) bool {
-	for _, f := range state.Figures {
-		f.X += m.X
-		f.Y += m.Y
-		//todo
+	for i := range state.Figures {
+		state.Figures[i].X += m.X
+		state.Figures[i].Y += m.Y
 	}
 	return false
 }
