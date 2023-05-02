@@ -43,7 +43,7 @@ func TestLoop_Optimisation(t *testing.T) {
 	l.Post(painter.OperationFunc(painter.GreenFill)) 
 	l.Post(painter.UpdateOp{})
 
-	if len(l.MQ.Ops) != 4 {
+	if l.MQ.Length() != 4 {
 		t.Fatal("Bad number of operations")
 	}
 
@@ -54,7 +54,7 @@ func TestLoop_Optimisation(t *testing.T) {
 		t.Fatal("Too much usless Fill calls")
 	}
 
-	if len(l.MQ.Ops) != 0 {
+	if l.MQ.Length() != 0 {
 		t.Fatal("Bad number of operations")
 	}
 }

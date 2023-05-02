@@ -59,16 +59,20 @@ func (l *Loop) StopAndWait() {
 
 // TODO: реалізувати власну чергу повідомлень.
 type messageQueue struct {
-	Ops []Operation
+	ops []Operation
 	mu sync.Mutex
 	blocked chan struct{}
+}
+
+func (mq *messageQueue) Length() int {
+	return len(mq.ops) 
 }
 
 func (mq *messageQueue) push(op Operation) {
 	mq.mu.Lock()
 	defer mq.mu.Unlock()
 
-	mq.Ops = append(mq.Ops, op)
+	mq.ops = append(mq.ops, op)
 
 	if mq.blocked != nil {
 		close(mq.blocked)
@@ -80,16 +84,16 @@ func (mq *messageQueue) pull() Operation {
 	mq.mu.Lock()
 	defer mq.mu.Unlock()
 
-	if len(mq.Ops) == 0 {
+	if len(mq.ops) == 0 {
 		mq.blocked = make(chan struct{})
 		mq.mu.Unlock()
 		<-mq.blocked
 		mq.mu.Lock()
 	}
 
-	op := mq.Ops[0]
-	mq.Ops[0] = nil
-	mq.Ops = mq.Ops[1:]
+	op := mq.ops[0]
+	mq.ops[0] = nil
+	mq.ops = mq.ops[1:]
 	return op
 }
 
@@ -97,5 +101,5 @@ func (mq *messageQueue) empty() bool {
 	mq.mu.Lock()
 	defer mq.mu.Unlock()
 
-	return len(mq.Ops) == 0
+	return len(mq.ops) == 0
 }
