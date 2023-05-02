@@ -35,6 +35,13 @@ func parseLine(line string) (painter.Operation, error) {
 		return nil, err
 	}
 	switch cmd {
+	case "fill":
+		return painter.CustomFill{
+			R:params[0],
+			G:params[1],
+			B:params[2],
+			A:params[3],
+		}, nil
 	case "white":
 		return painter.OperationFunc(painter.WhiteFill), nil
 	case "green":
@@ -78,7 +85,7 @@ func getCmdAndParams(cl string) (string, []int, error) {
 	}
 
 	switch cmd {
-	case "bgrect":
+	case "bgrect","fill":
 		if len(params) < 4 {
 			return "", nil, LitParErr
 		}

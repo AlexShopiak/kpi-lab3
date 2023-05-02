@@ -17,7 +17,7 @@ func main() {
 		parser lang.Parser  // Парсер команд.
 	)
 
-	pv.Debug = true
+	//pv.Debug = true
 	pv.Width = 800
 	pv.Height = 800
 	pv.Title = "Simple painter"

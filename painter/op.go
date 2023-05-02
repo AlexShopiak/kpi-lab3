@@ -91,6 +91,15 @@ func Reset(t screen.Texture) {
 	state.Figures = []FigureOp{}
 }
 
+//Тестова операція для використання у сриптах. Не бажана для використання
+type CustomFill struct{
+	R,G,B,A int 
+}
+func (c CustomFill) Do(t screen.Texture) bool {
+	state.BgClr = color.RGBA{R: uint8(c.R), G: uint8(c.G), B: uint8(c.B), A: uint8(c.A)}
+	return false
+}
+
 
 type BgrectOp struct{ X1, Y1, X2, Y2 int }
 func (r BgrectOp) Do(t screen.Texture) bool {
