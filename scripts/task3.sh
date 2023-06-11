@@ -87,7 +87,7 @@ changeSteps () {
     stepY=$(( $RANDOM % 20 + 10 ))
 }
 
-move++ () {
+movepp () {
     while true;
     do
         changeRGBA
@@ -113,7 +113,7 @@ move++ () {
     done
 }
 
-move+- () {
+movepm () {
     while true;
     do
         changeRGBA
@@ -139,7 +139,7 @@ move+- () {
     done
 }
 
-move-+ () {
+movemp () {
     while true;
     do
         changeRGBA
@@ -165,7 +165,7 @@ move-+ () {
     done
 }
 
-move-- () {
+movemm () {
     while true;
     do
         changeRGBA
@@ -195,41 +195,41 @@ startAnim () {
     if [ $posX -ge $max ]; then
         if [ $posY -ge $avg ]; then
             changeSteps
-            move--
+            movemm
             startAnim
         else
             changeSteps
-            move-+
+            movemp
             startAnim
         fi
     elif [ $posX -le $min ]; then
         if [ $posY -ge $avg ]; then
             changeSteps
-            move+-
+            movepm
             startAnim
         else
             changeSteps
-            move+-
+            movepm
             startAnim
         fi
     elif [ $posY -ge $max ]; then
         if [ $posX -ge $avg ]; then
             changeSteps
-            move+-
+            movepm
             startAnim
         else
             changeSteps
-            move--
+            movemm
             startAnim
         fi
     elif [ $posY -le $min ]; then
         if [ $posX -ge $avg ]; then
             changeSteps
-            move-+
+            movemp
             startAnim
         else
             changeSteps
-            move++
+            movepp
             startAnim
         fi
     else 
@@ -247,5 +247,5 @@ curl -X POST http://localhost:17000 -d "figure $posX $posY"
 curl -X POST http://localhost:17000 -d "update"
 sleep $interval
 
-move++
+movepp
 startAnim
